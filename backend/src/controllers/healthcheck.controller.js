@@ -2,7 +2,6 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import config from "../config/index.js";
 
 const healthCheckService = asyncHandler(async (req,res) => {
-    console.log("hellloooo");
     return res
     .status(200)
     .json({
