@@ -1,25 +1,28 @@
-import { asyncHandler } from "../utils/asyncHandler.js";
-import initDatacube from "../utils/datacubeHandler.js";
-import PayloadValidationServices from "../services/validationservices.js";
-import { campaignSchema,campaignTestSchema } from "../utils/payloadSchema.js"
+import initDatacube from "./datacubeservices.js";
+import PayloadValidationServices from "./validationservices.js";
+import { campaignSchema } from "../utils/payloadSchema.js"
 import {formatDateTime, calculateDateRange} from "../utils/helper.js"
-import { campaigns } from "../utils/dummydata.js"
+import { campaigns } from "../utils/dummydata.js";
 
-const campaignlist = asyncHandler(async (req, res) => {
-    const { timeInterval, startDate, endDate } = req.body;
 
-    const validatePayload = PayloadValidationServices.validateData(campaignTestSchema, {
+const fetchDataFromDatacube = async(timeInterval, startDate, endDate,workspaceId,userId)=>{
+
+    // const { datacube, database, collection } = initDatacube();
+
+    const validatePayload = PayloadValidationServices.validateData(campaignSchema, {
         timeInterval: timeInterval,
         startDate: startDate,
-        endDate: endDate
+        endDate: endDate,
+        workspaceId: workspaceId,
+        userId: userId
     });
 
     if (!validatePayload.isValid) {
-        return res.status(400).json({
+        return {
             success: false,
             message: "Invalid payload",
             errors: validatePayload.errors
-        });
+        }
     }
 
     const dateInterval = calculateDateRange(timeInterval, startDate, endDate);
@@ -32,13 +35,19 @@ const campaignlist = asyncHandler(async (req, res) => {
         return campaignDate >= startDate && campaignDate <= endDate;
     });
 
-    return res.status(200).json({
+    const data = campaigns;
+
+    return {
         success: true,
         message: "Campaign list fetched successfully",
-        response: filteredCampaigns
-    });
-});
+        response: {
+            data,
+            filteredCampaigns
+        }
+    }
+}
+
 
 export {
-    campaignlist
+    fetchDataFromDatacube
 }

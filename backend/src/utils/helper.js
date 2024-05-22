@@ -44,6 +44,9 @@ function calculateDateRange(timeInterval, startDate, endDate) {
 }
 
 
+const hasDataChanged = (prevData, newData) => {
+    return JSON.stringify(prevData) !== JSON.stringify(newData);
+};
 
 
 
@@ -58,6 +61,7 @@ const reportInterval = {
 export {
     formatDateTime,
     reportInterval,
-    calculateDateRange
+    calculateDateRange,
+    hasDataChanged
 }
 
