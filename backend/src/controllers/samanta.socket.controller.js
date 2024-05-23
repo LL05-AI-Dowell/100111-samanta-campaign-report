@@ -51,7 +51,7 @@ const handleConnection = async (socket, userData, previousData) => {
         } catch (error) {
             console.error('Error fetching data:', error);
         }
-    }, 10000);
+    }, 30000);
 };
 
 export {
