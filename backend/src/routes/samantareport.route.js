@@ -1,9 +1,10 @@
 import { Router } from "express";
-import { campaignlist } from "../controllers/samantareport.controller.js"
+import { campaignlists } from "../controllers/samantareport.controller.js"
 
 
 const router = Router()
 
-router.post("/", campaignlist)
+router.post("/", campaignlists)
 
 export default router;
+

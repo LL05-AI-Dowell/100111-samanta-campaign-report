@@ -37,8 +37,10 @@ The `userData` event is used to transmit user data from the client to the server
     - `CUSTOM`: "CUSTOM"
 - `startDate`: The start date for data retrieval (send if the timeInterval is custom).
 - `endDate`: The end date for data retrieval (send if the timeInterval is custom).
-- `workspaceId`: The ID of the workspace.
-- `userId`: The ID of the user.
+- `creatorId`: The ID of the workspace.
+- `apiKey`: The apiKey of the user.
+- `limit`: The maximum number of data to be returned
+- `offset`: The offset you want to skip
 
 #### Client-side Example:
 
@@ -47,8 +49,10 @@ socket.emit('userData', {
   timeInterval: 'ONE_DAY',
   startDate: 'YYYY-MM-DD', // Send if timeInterval is 'CUSTOM'
   endDate: 'YYYY-MM-DD',   // Send if timeInterval is 'CUSTOM'
-  workspaceId: 'your_workspace_id',
-  userId: 'your_user_id'
+  creatorId: 'your_workspace_id',
+  apiKey: 'your_user_id',
+  limit: 'limit',
+  offset: 'offset'
 });
 ```
 
@@ -85,12 +89,29 @@ If data retrieval is successful, the server emits:
 ```json
 {
   "success": true,
-  "data": {
+  "message": "Campaign list fetched successfully",
+  "response": {
     // Your data object here
   },
   "lastUpdated": "YYYY-MM-DDTHH:MM:SSZ"
 }
 ```
+
+## Rest API
+
+- **URL**: `api/v1/samanta-report/`
+- **Bearer Token**: `"your_api_key"`
+- **Payload**:
+  ```json
+  {
+      "timeInterval": "ONE_WEEK",
+      "creatorId": "your-workspace-id",
+      "limit": 100,
+      "offset": 0
+  }
+  ```
+
+This API endpoint allows you to retrieve campaign reports. You need to provide a bearer token for authentication, and the payload should include the time interval, workspace ID (creatorId), limit (maximum number of data to be returned), and offset (skip offset).
 
 ## Conclusion
 

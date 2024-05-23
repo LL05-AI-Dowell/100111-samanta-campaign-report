@@ -36,16 +36,17 @@ const initializeSocket = (server) => {
 };
 
 const handleConnection = async (socket, userData, previousData) => {
-    const { timeInterval, startDate, endDate, workspaceId, userId } = userData;
+    const { timeInterval, startDate, endDate, creatorId, apiKey,limit,offset } = userData;
+
 
     socket.intervalId = setInterval(async () => {
         try {
-            const currentData = await fetchDataFromDatacube(timeInterval, startDate, endDate, workspaceId, userId);
+            const currentData = await fetchDataFromDatacube(timeInterval, startDate, endDate, creatorId, apiKey,limit,offset);
             const dateTime = new Date();
             if (!currentData.success) {
                 socket.emit('dataUpdate', { success: false, message: currentData.message, dateTime: dateTime });
-            } else if (previousData === null || hasDataChanged(previousData.response.data, currentData.response.data)) {
-                socket.emit('dataUpdate', { success: true, data: currentData.response.data, dateTime: dateTime });
+            } else if (previousData === null || hasDataChanged(previousData.response, currentData.response)) {
+                socket.emit('dataUpdate', { success: true,message: currentData.message, response: currentData.response, dateTime: dateTime });
                 previousData = currentData;
             }
         } catch (error) {

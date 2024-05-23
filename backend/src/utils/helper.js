@@ -1,48 +1,64 @@
-function formatDateTime(dateTimeString) {
-    const dateTime = new Date(dateTimeString);
-    
-    const year = dateTime.getFullYear();
-    const month = String(dateTime.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed, so add 1
-    const day = String(dateTime.getDate()).padStart(2, '0');
-    const hours = String(dateTime.getHours()).padStart(2, '0');
-    const minutes = String(dateTime.getMinutes()).padStart(2, '0');
-    const seconds = String(dateTime.getSeconds()).padStart(2, '0');
+const getFormattedDate = () => {
+    const pad = (number, length) => {
+        let str = '' + number;
+        while (str.length < length) {
+            str = '0' + str;
+        }
+        return str;
+    };
 
-    const datePart = `${year}-${month}-${day}`;
-    const timePart = `${hours}:${minutes}:${seconds}`;
-    
-    return { date: datePart, time: timePart };
-}
+    const currentDate = new Date();
+    const year = currentDate.getUTCFullYear();
+    const month = pad(currentDate.getUTCMonth() + 1, 2);
+    const day = pad(currentDate.getUTCDate(), 2);
+    const hours = pad(currentDate.getUTCHours(), 2);
+    const minutes = pad(currentDate.getUTCMinutes(), 2);
+    const seconds = pad(currentDate.getUTCSeconds(), 2);
+    const milliseconds = pad(currentDate.getUTCMilliseconds(), 3);
+    const microseconds = pad(Math.floor(Math.random() * 1000), 3); 
 
-function calculateDateRange(timeInterval, startDate, endDate) {
-    let start_date, end_date;
+    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}${microseconds}+00:00`;
+};
 
-    if (timeInterval === "ONE_DAY") {
-        start_date = formatDateTime(new Date()).date;
-        end_date = formatDateTime(new Date()).date;
-    } else if (timeInterval === "ONE_WEEK") {
-        const currentDate = new Date();
-        currentDate.setDate(currentDate.getDate() - 7);
-        end_date = formatDateTime(new Date()).date;
-        start_date = formatDateTime(currentDate).date;
-    } else if (timeInterval === "ONE_MONTH") {
-        const currentDate = new Date();
-        currentDate.setDate(currentDate.getDate() - 30);
-        start_date = formatDateTime(currentDate).date;
-        end_date = formatDateTime(new Date()).date;
-    } else if (timeInterval === "ONE_YEAR") {
-        const currentDate = new Date();
-        currentDate.setDate(currentDate.getDate() - 365);
-        start_date = formatDateTime(currentDate).date;
-        end_date = formatDateTime(new Date()).date;
-    } else if (timeInterval === "CUSTOM") {
-        start_date = startDate; 
-        end_date = endDate;
+
+export const calculateDateRanges = (timeInterval, startDate, endDate) => {
+    const now = new Date();
+    let start, end;
+
+    switch (timeInterval) {
+        case 'ONE_DAY':
+            start = new Date(now);
+            start.setDate(now.getDate() - 1);
+            end = now;
+            break;
+        case 'ONE_WEEK':
+            start = new Date(now);
+            start.setDate(now.getDate() - 7);
+            end = now;
+            break;
+        case 'ONE_MONTH':
+            start = new Date(now);
+            start.setMonth(now.getMonth() - 1);
+            end = now;
+            break;
+        case 'ONE_YEAR':
+            start = new Date(now);
+            start.setFullYear(now.getFullYear() - 1);
+            end = now;
+            break;
+        case 'CUSTOM':
+            start = new Date(startDate);
+            end = new Date(endDate);
+            break;
+        default:
+            throw new Error('Invalid time interval');
     }
 
-    return { start_date, end_date };
-}
-
+    return {
+        start_date: start.toISOString(),
+        end_date: end.toISOString()
+    };
+};
 
 const hasDataChanged = (prevData, newData) => {
     return JSON.stringify(prevData) !== JSON.stringify(newData);
@@ -58,10 +74,21 @@ const reportInterval = {
     CUSTOM : "CUSTOM",
 }
 
+const datacubeDetails = (workspaceId) => {
+    return {
+        campaign_details: `${workspaceId}_campaign_details`,
+        user_info: `${workspaceId}_user_info`,
+        emails: `${workspaceId}_emails`,
+        links: `${workspaceId}_links`,
+        database_name: `${workspaceId}_samanta_campaign_db`
+    };
+};
+
+
 export {
-    formatDateTime,
+    getFormattedDate,
     reportInterval,
-    calculateDateRange,
-    hasDataChanged
+    hasDataChanged,
+    datacubeDetails
 }
 
