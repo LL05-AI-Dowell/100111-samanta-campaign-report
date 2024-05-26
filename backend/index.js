@@ -4,7 +4,7 @@ import cookieParser from "cookie-parser";
 import routes from "./src/routes/index.js";
 import config from "./src/config/index.js";
 import http from "http";
-import { initializeSocket } from "./src/controllers/samanta.socket.controller.js";
+import { initializeSocket } from "./src/config/socket.js";
 
 const app = express();
 

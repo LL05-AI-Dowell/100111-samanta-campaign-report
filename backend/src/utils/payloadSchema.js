@@ -11,7 +11,11 @@ const campaignSchema = z.object({
     apiKey: z.string()
 });
 
-
+const userInfoSchema = z.object({
+    creatorId: z.string(),
+    apiKey: z.string()
+});
 export {
-    campaignSchema
+    campaignSchema,
+    userInfoSchema
 }
