@@ -1,6 +1,6 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import PayloadValidationServices from "../services/validationservices.js";
-import { campaignSchema } from "../utils/payloadSchema.js"
+import { campaignSchema,userInfoSchema } from "../utils/payloadSchema.js"
 import {calculateDateRanges, datacubeDetails} from "../utils/helper.js"
 import Datacubeservices from '../services/datacubeservices.js';
 
@@ -114,7 +114,60 @@ const campaignlists = asyncHandler(async (req, res) => {
     });
 });
 
+const userInfo = asyncHandler( async(req, res) => {
+    const creatorId  = req.query.creator_id;
 
+    console.log(creatorId);
+
+    const apiKey = req.headers['authorization'];
+    if (!apiKey || !apiKey.startsWith('Bearer ')) {
+        return res.status(401).json({
+            success: false,
+            message: "Please provide the API key",
+        });
+    }
+
+    const datacube = new Datacubeservices(apiKey.split(' ')[1]);
+
+    const validatePayload = PayloadValidationServices.validateData(userInfoSchema, {
+        creatorId: creatorId,
+        apiKey: apiKey
+    });
+
+
+    if (!validatePayload.isValid) {
+        return res.status(400).json({
+            success: false,
+            message: "Invalid payload",
+            errors: validatePayload.errors
+        });
+    }
+
+    const response = await datacube.dataRetrieval(
+        datacubeDetails(creatorId).database_name,
+        datacubeDetails(creatorId).user_info,
+        {
+            workspace_id: creatorId
+        },
+        1,
+        0
+    );
+    console.log(response);
+
+    if(!response.success) {
+        return res.status(404).json({
+            success: false,
+            message: response.message
+        });
+    }
+
+    return res.status(200).json({
+        success: true,
+        message: "User info fetched successfully",
+        response: response.data
+    });
+})
 export {
-    campaignlists
+    campaignlists,
+    userInfo
 }

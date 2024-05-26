@@ -1,10 +1,10 @@
 import PayloadValidationServices from "./validationservices.js";
-import { campaignSchema } from "../utils/payloadSchema.js"
+import { campaignSchema, userInfoSchema } from "../utils/payloadSchema.js"
 import {calculateDateRanges, datacubeDetails} from "../utils/helper.js"
-import Datacubeservices from '../services/datacubeservices.js';
+import Datacubeservices from './datacubeservices.js';
 
 
-const fetchDataFromDatacube = async(timeInterval, startDate, endDate,creatorId ,apiKey,limit,offset)=>{
+const organizationReports = async(timeInterval, startDate, endDate,creatorId ,apiKey,limit,offset)=>{
     
     const validatePayload = PayloadValidationServices.validateData(campaignSchema, {
         timeInterval: timeInterval,
@@ -102,7 +102,45 @@ const fetchDataFromDatacube = async(timeInterval, startDate, endDate,creatorId ,
     }
 }
 
+const userInfo = async (creatorId ,apiKey) => {
+    const validatePayload = PayloadValidationServices.validateData(userInfoSchema, {
+        creatorId: creatorId,
+        apiKey: apiKey
+    });
+
+    if (!validatePayload.isValid) {
+        return {
+            success: false,
+            message: "Invalid payload",
+            errors: validatePayload.errors
+        }
+    }
+    const datacube = new Datacubeservices(apiKey);
+    const response = await datacube.dataRetrieval(
+        datacubeDetails(creatorId).database_name,
+        datacubeDetails(creatorId).user_info,
+        {
+            workspace_id: creatorId
+        },
+        1,
+        0
+    );
+
+    if(!response.success){
+        return {
+            success: false,
+            message: "Failed to retrieve user data from databse",
+        }
+    }
+
+    return {
+        success: true,
+        message: "User data retrieve from the databse was successful",
+        response: response.data
+    }
+}
 
 export {
-    fetchDataFromDatacube
+    organizationReports,
+    userInfo
 }
