@@ -1,6 +1,6 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import PayloadValidationServices from "../services/validationservices.js";
-import { campaignSchema,userInfoSchema } from "../utils/payloadSchema.js"
+import { campaignSchema,userInfoSchema, linkInfoSchema } from "../utils/payloadSchema.js"
 import {calculateDateRanges, datacubeDetails} from "../utils/helper.js"
 import Datacubeservices from '../services/datacubeservices.js';
 
@@ -167,7 +167,75 @@ const userInfo = asyncHandler( async(req, res) => {
         response: response.data
     });
 })
+
+const linksReportForCampaign = asyncHandler(async(req, res) => {
+
+    const { campaignId, creatorId, limit, offset } = req.body;
+
+    const apiKey = req.headers['authorization'];
+    if (!apiKey || !apiKey.startsWith('Bearer ')) {
+        return res.status(401).json({
+            success: false,
+            message: "Please provide the API key",
+        });
+    }
+
+    const validatePayload = PayloadValidationServices.validateData(linkInfoSchema, {
+        creatorId: creatorId,
+        campaignId: campaignId,
+        apiKey: apiKey,
+        limit: limit,
+        offset: offset
+    });
+
+    if (!validatePayload.isValid) {
+        return {
+            success: false,
+            message: "Invalid payload",
+            errors: validatePayload.errors
+        }
+    }
+
+    const datacube = new Datacubeservices(apiKey.split(' ')[1]);
+    const response = await datacube.dataRetrieval(
+        datacubeDetails(creatorId).database_name,
+        datacubeDetails(creatorId).links,
+        {
+            creator_id: creatorId,
+            campaign_id: campaignId
+
+        },
+        limit,
+        offset
+    );
+
+    if (!response.success) {
+        return {
+            success: false,
+            message: "Failed to retrieve link data from databse",
+        }
+    }
+    
+    const linkData = response.data
+
+    const report = linkData.map(link => ({
+        campaignId: link.campaign_id,
+        url: link.url,
+        isCrawled: link.is_crawled,
+        lengthOfLinks: link.links.length,
+        added_at: link.added_at,
+        links: link.links
+    }));
+
+    return res.status(200).json({
+        success: true,
+        message: "Link list fetched successfully",
+        response: report
+    });
+})
+
 export {
     campaignlists,
-    userInfo
+    userInfo,
+    linksReportForCampaign
 }

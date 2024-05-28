@@ -84,7 +84,11 @@ const datacubeDetails = (workspaceId) => {
     };
 };
 
-
+// campaign_details: `64f03084a7058c23ee36cfc9_campaign_details`,
+// user_info: `64f03084a7058c23ee36cfc9_user_info`,
+// emails: `64f03084a7058c23ee36cfc9_emails`,
+// links: `64f03084a7058c23ee36cfc9_links`,
+// database_name: `64f03084a7058c23ee36cfc9_samanta_campaign_db`
 export {
     getFormattedDate,
     reportInterval,

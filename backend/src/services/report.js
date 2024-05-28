@@ -1,5 +1,5 @@
 import PayloadValidationServices from "./validationservices.js";
-import { campaignSchema, userInfoSchema } from "../utils/payloadSchema.js"
+import { campaignSchema, userInfoSchema, linkInfoSchema } from "../utils/payloadSchema.js"
 import {calculateDateRanges, datacubeDetails} from "../utils/helper.js"
 import Datacubeservices from './datacubeservices.js';
 
@@ -140,7 +140,63 @@ const userInfo = async (creatorId ,apiKey) => {
     }
 }
 
+const linksReport = async (creatorId, campaignId, apiKey,limit, offset) => {
+    const validatePayload = PayloadValidationServices.validateData(linkInfoSchema, {
+        creatorId: creatorId,
+        campaignId: campaignId,
+        apiKey: apiKey,
+        limit: limit,
+        offset: offset
+    });
+
+    if (!validatePayload.isValid) {
+        return {
+            success: false,
+            message: "Invalid payload",
+            errors: validatePayload.errors
+        }
+    }
+
+    const datacube = new Datacubeservices(apiKey);
+    const response = await datacube.dataRetrieval(
+        datacubeDetails(creatorId).database_name,
+        datacubeDetails(creatorId).links,
+        {
+            creator_id: creatorId,
+            campaign_id: campaignId
+
+        },
+        limit,
+        offset
+    );
+
+    if (!response.success) {
+        return {
+            success: false,
+            message: "Failed to retrieve link data from databse",
+        }
+    }
+    
+    const linkData = response.data
+
+    const report = linkData.map(link => ({
+        campaignId: link.campaign_id,
+        url: link.url,
+        isCrawled: link.is_crawled,
+        lengthOfLinks: link.links.length,
+        added_at: link.added_at,
+        links: link.links
+    }));
+
+    return {
+        success: true,
+        message: "Link list fetched successfully",
+        response: report
+    }
+}
+
 export {
     organizationReports,
-    userInfo
+    userInfo,
+    linksReport
 }

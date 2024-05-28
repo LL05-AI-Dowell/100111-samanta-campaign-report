@@ -1,6 +1,5 @@
 import { Server } from 'socket.io';
-import { organizationReport } from '../controllers/organization.controller.js'
-import { userInfoReport } from '../controllers/userinfo.controller.js'
+import { organizationReport, userInfoReport, linkReportForCampaign  } from '../controllers/report.controller.js';
 
 const initializeSocket = (server) => {
     const io = new Server(server, {
@@ -36,6 +35,17 @@ const initializeSocket = (server) => {
                 }
             }
         })
+
+        socket.on('link-report', async (data) => {
+            console.log(data);
+            if (data) {
+                try {
+                    await linkReportForCampaign(socket, data);
+                } catch (error) {
+                    console.error('Error handling connection:', error);
+                }
+            }
+        });
 
         socket.on('disconnect', () => {
             console.log(`User disconnected: ${socket.id}`);

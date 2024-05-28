@@ -15,7 +15,17 @@ const userInfoSchema = z.object({
     creatorId: z.string(),
     apiKey: z.string()
 });
+
+const linkInfoSchema = z.object({
+    creatorId: z.string(),
+    campaignId: z.string(),
+    apiKey: z.string(),
+    limit: z.number(),
+    offset: z.number()
+})
+
 export {
     campaignSchema,
-    userInfoSchema
+    userInfoSchema,
+    linkInfoSchema
 }
