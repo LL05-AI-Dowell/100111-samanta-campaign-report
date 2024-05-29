@@ -84,6 +84,14 @@ const datacubeDetails = (workspaceId) => {
     };
 };
 
+const logInfo = (message) => {
+    console.info(`[INFO]: ${message}`);
+};
+
+const logError = (message, error) => {
+    console.error(`[ERROR]: ${message}`, error);
+};
+
 // campaign_details: `64f03084a7058c23ee36cfc9_campaign_details`,
 // user_info: `64f03084a7058c23ee36cfc9_user_info`,
 // emails: `64f03084a7058c23ee36cfc9_emails`,
@@ -93,6 +101,8 @@ export {
     getFormattedDate,
     reportInterval,
     hasDataChanged,
-    datacubeDetails
+    datacubeDetails,
+    logInfo,
+    logError
 }
 
