@@ -19,7 +19,7 @@ const organizationReport = async (socket, userData) => {
         } catch (error) {
             logError('Error fetching organization reports:', error);
         }
-    }, 10000);
+    }, 20000);
 };
 
 const userInfoReport = async (socket, userData) => {
