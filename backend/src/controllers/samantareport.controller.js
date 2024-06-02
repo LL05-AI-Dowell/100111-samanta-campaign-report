@@ -99,6 +99,7 @@ const campaignlists = asyncHandler(async (req, res) => {
             id: campaign._id,
             title: campaign.title,
             emailCount: campaign.audiences.length,
+            status: campaign.is_active,
             linkCount: campaign.leads_links.length
         };
 
