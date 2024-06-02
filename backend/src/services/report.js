@@ -98,7 +98,8 @@ const organizationReports = async (timeInterval, startDate, endDate, creatorId, 
                 id: campaign._id,
                 title: campaign.title,
                 emailCount: campaign.audiences.length,
-                linkCount: campaign.leads_links.length
+                linkCount: campaign.leads_links.length,
+                status: campaign.is_active
             };
 
             report.totalAudiences += campaignDetail.emailCount;
